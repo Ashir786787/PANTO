@@ -11,7 +11,10 @@ function subscribeToMedia(query: string) {
 }
 
 function getMediaSnapshot(query: string) {
-  return () => window.matchMedia(query).matches;
+  return () => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  };
 }
 
 export function useMediaQuery(query: string): boolean {
