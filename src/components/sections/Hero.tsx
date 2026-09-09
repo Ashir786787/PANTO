@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -9,7 +9,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Search } from "lucide-react";
+import { Check, Search } from "lucide-react";
 import { useProducts } from "@/context/ProductsContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -33,14 +33,76 @@ const textItemVariants = {
   },
 };
 
-const imageVariants = {
-  hidden: { opacity: 0, scale: 0.96 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.9, delay: 1.0, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
+const SWATCHES = [
+  { id: "orange", label: "Orange", className: "bg-accent" },
+  { id: "teal", label: "Teal", className: "bg-swatch-teal" },
+  { id: "white", label: "White", className: "bg-swatch-white" },
+] as const;
+
+type SwatchId = (typeof SWATCHES)[number]["id"];
+
+function SwatchChip() {
+  const [selected, setSelected] = useState<SwatchId>("orange");
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 1.2 }}
+    >
+      <div className="relative">
+        <div className="flex items-center gap-2 rounded-pill bg-[rgba(30,32,36,0.9)] px-3.5 py-2.5 backdrop-blur-md">
+          {SWATCHES.map((swatch) => (
+            <button
+              key={swatch.id}
+              type="button"
+              onClick={() => setSelected(swatch.id)}
+              aria-label={`Select ${swatch.label} swatch`}
+              aria-pressed={selected === swatch.id}
+              className={`flex h-6 w-6 items-center justify-center rounded-full transition-transform hover:scale-110 ${swatch.className} ${
+                selected === swatch.id ? "" : "ring-[1.5px] ring-white/40"
+              }`}
+            >
+              {selected === swatch.id && (
+                <Check
+                  size={13}
+                  strokeWidth={3.5}
+                  className={selected === "white" ? "text-heading" : "text-white"}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 top-full -translate-x-1/2 border-l-[7px] border-r-[7px] border-t-[9px] border-l-transparent border-r-transparent border-t-[rgba(30,32,36,0.9)]"
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function PingMarker({ size }: { size: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay: 1.4 }}
+      className="relative"
+      style={{ width: size, height: size }}
+    >
+      <span className="absolute inset-0 rounded-full border-[1.5px] border-white/50 bg-white/5" />
+      <span className="absolute left-1/2 top-1/2 h-[11px] w-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+      <motion.span
+        aria-hidden="true"
+        className="absolute inset-0 rounded-full border-[1.5px] border-white/50"
+        style={{ transformOrigin: "center" }}
+        animate={{ scale: [0.25, 1], opacity: [0.6, 0] }}
+        transition={{ repeat: Infinity, duration: 2.2, ease: "easeOut" }}
+      />
+    </motion.div>
+  );
+}
 
 export default function Hero({ id }: HeroProps) {
   const { searchQuery, setSearchQuery } = useProducts();
@@ -50,11 +112,11 @@ export default function Hero({ id }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(mouseY, [0, 1], [7, -7]), {
+  const rotateX = useSpring(useTransform(mouseY, [0, 1], [4, -4]), {
     stiffness: 120,
     damping: 20,
   });
-  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-7, 7]), {
+  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-4, 4]), {
     stiffness: 120,
     damping: 20,
   });
@@ -78,25 +140,45 @@ export default function Hero({ id }: HeroProps) {
       ref={sectionRef}
       id={id}
       onMouseMove={handleMouseMove}
-      className="relative flex min-h-[640px] flex-col overflow-visible bg-hero-bg lg:min-h-[720px]"
+      className="relative flex min-h-[640px] flex-col overflow-hidden bg-hero-bg lg:min-h-[720px]"
     >
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/background.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
+      <motion.div
+        aria-hidden="true"
+        style={{
+          rotateX: reduceMotion ? 0 : rotateX,
+          rotateY: reduceMotion ? 0 : rotateY,
+        }}
+        className="absolute inset-0"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 1.25 }}
+          animate={{ opacity: 1, scale: 1.12 }}
+          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+          <Image
+            src="/images/background.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.2 }}
+          className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/20 to-black/40"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-hero-bg-alt/80 via-hero-bg/55 to-hero-bg" />
-      </div>
+      </motion.div>
 
       <motion.div
         variants={containerVariants}
         initial={reduceMotion ? false : "hidden"}
         animate="visible"
-        className="relative z-10 mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center px-6 pb-24 pt-[152px] text-center md:px-10 lg:px-20"
+        className="relative z-10 mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center justify-center px-6 pb-28 pt-28 text-center md:px-10 lg:px-20"
       >
         <motion.h1
           variants={textItemVariants}
@@ -107,7 +189,7 @@ export default function Hero({ id }: HeroProps) {
 
         <motion.p
           variants={textItemVariants}
-          className="mt-4 max-w-[640px] text-[15px] font-normal leading-[1.7] text-white/70 md:text-base"
+          className="mt-4 max-w-[640px] text-[15px] font-normal leading-[1.7] text-white/80 md:text-base"
         >
           Create a warm, modern home with our thoughtfully designed furniture —
           where every piece tells a story of comfort and craftsmanship.
@@ -138,61 +220,28 @@ export default function Hero({ id }: HeroProps) {
             <Search size={18} strokeWidth={2} />
           </button>
         </motion.form>
-
-        <motion.div
-          variants={imageVariants}
-          initial={reduceMotion ? false : "hidden"}
-          animate="visible"
-          style={{
-            rotateX: reduceMotion ? 0 : rotateX,
-            rotateY: reduceMotion ? 0 : rotateY,
-            transformStyle: "preserve-3d",
-          }}
-          className="relative mt-16 w-[70%] max-w-[420px] lg:mt-20 lg:w-[60%]"
-        >
-          <Image
-            src="/images/product-hero.jpg"
-            alt="Minimalist sofa with cushions, plant and side table"
-            width={370}
-            height={476}
-            priority
-            sizes="(min-width: 1024px) 60vw, 70vw"
-            className="relative z-10 h-auto w-full translate-y-[18%] rounded-card object-cover shadow-card-hover"
-          />
-
-          <motion.div
-            aria-hidden="true"
-            animate={{ y: [0, -12, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 5,
-              ease: "easeInOut",
-              repeatDelay: 0.4,
-            }}
-            className="absolute left-[-8%] top-[18%] z-20 flex items-center gap-2 rounded-[14px] border border-white/20 bg-white/20 px-4 py-3 backdrop-blur-md"
-          >
-            <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white" />
-            <span className="h-2.5 w-2.5 rounded-full bg-navy-button" />
-          </motion.div>
-
-          <motion.div
-            aria-hidden="true"
-            animate={{ y: [0, 14, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 6,
-              ease: "easeInOut",
-              repeatDelay: 0.6,
-            }}
-            className="absolute right-[-6%] bottom-[26%] z-20 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/25 backdrop-blur-md"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent">
-              <Search size={15} strokeWidth={2.2} className="text-white" />
-            </span>
-          </motion.div>
-        </motion.div>
       </motion.div>
+
+      <div
+        aria-hidden="true"
+        className="absolute left-[9%] top-[44%] z-20 md:left-[13%] md:top-[46%]"
+      >
+        <SwatchChip />
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="absolute right-[12%] top-[56%] z-20 md:right-[14%] md:top-[58%]"
+      >
+        <PingMarker size={40} />
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="absolute right-[21%] top-[47%] z-20 md:right-[24%] md:top-[50%]"
+      >
+        <PingMarker size={28} />
+      </div>
     </section>
   );
 }
