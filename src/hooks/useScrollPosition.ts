@@ -1,27 +1,21 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-
-function getScrollSnapshot(threshold: number): boolean {
-  if (typeof window === "undefined") return false;
-  return window.scrollY > threshold;
-}
-
-function getScrollSnapshotValue(threshold: number) {
-  return () => getScrollSnapshot(threshold);
-}
-
-function getScrollSubscribe() {
-  return (onStoreChange: () => void) => {
-    window.addEventListener("scroll", onStoreChange, { passive: true });
-    return () => window.removeEventListener("scroll", onStoreChange);
-  };
-}
+import { useEffect, useState } from "react";
 
 export function useScrollPosition(threshold = 10): boolean {
-  return useSyncExternalStore(
-    getScrollSubscribe(),
-    getScrollSnapshotValue(threshold),
-    getScrollSnapshotValue(threshold),
-  );
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    const frame = requestAnimationFrame(() => {
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [threshold]);
+
+  return scrolled;
 }

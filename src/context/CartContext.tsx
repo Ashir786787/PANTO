@@ -23,7 +23,6 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "panto-cart";
 
 function readStoredCart(): CartItem[] {
-  if (typeof window === "undefined") return [];
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     return stored ? (JSON.parse(stored) as CartItem[]) : [];
@@ -32,36 +31,49 @@ function readStoredCart(): CartItem[] {
   }
 }
 
+function writeStoredCart(items: CartItem[]) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    void items;
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(readStoredCart);
+  const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      void items;
-    }
-  }, [items]);
+    const frame = requestAnimationFrame(() => setItems(readStoredCart()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const addToCart = (product: Product) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
+      const next = existing
+        ? prev.map((item) =>
+            item.product.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item,
+          )
+        : [...prev, { product, quantity: 1 }];
+      writeStoredCart(next);
+      return next;
     });
   };
 
   const removeFromCart = (productId: number) => {
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
+    setItems((prev) => {
+      const next = prev.filter((item) => item.product.id !== productId);
+      writeStoredCart(next);
+      return next;
+    });
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    writeStoredCart([]);
+    setItems([]);
+  };
 
   const count = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
