@@ -1,3 +1,7 @@
-﻿export default function WhyChoosingUs() {
-  return null;
+﻿interface SectionProps {
+  id: string;
+}
+
+export default function WhyChoosingUs({ id }: SectionProps) {
+  return <section id={id} />;
 }

@@ -1,3 +1,7 @@
-﻿export default function ExperienceSection() {
-  return null;
+﻿interface SectionProps {
+  id: string;
+}
+
+export default function ExperienceSection({ id }: SectionProps) {
+  return <section id={id} />;
 }

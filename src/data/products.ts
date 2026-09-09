@@ -16,7 +16,7 @@ export const products: Product[] = [
     category: "Chair",
     price: 149,
     rating: 5,
-    image: "/images/product-sofa.jpg",
+    image: "/images/product-chair.jpg",
     stock: 8,
   },
   {
@@ -34,7 +34,7 @@ export const products: Product[] = [
     category: "Chair",
     price: 139,
     rating: 5,
-    image: "/images/product-sofa.jpg",
+    image: "/images/product-chair.jpg",
     stock: 10,
   },
 ];
