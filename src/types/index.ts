@@ -1,11 +1,13 @@
+export type ProductCategory = "Chair" | "Beds" | "Sofa" | "Lamp";
+
 export interface Product {
   id: number;
   name: string;
-  category: "Sofa" | "Chair" | "Table" | "Cabinet";
+  category: ProductCategory;
   price: number;
   rating: number;
   image: string;
-  stock: number;
+  tier?: "sample" | "premium";
 }
 
 export interface Testimonial {
@@ -16,6 +18,7 @@ export interface Testimonial {
   rating: number;
   photo: string;
   avatar: string;
+  avatarBoost?: boolean;
 }
 
 export interface CartItem {

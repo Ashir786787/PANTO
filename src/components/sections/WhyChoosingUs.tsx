@@ -48,7 +48,7 @@ const cardVariants = {
 
 export default function WhyChoosingUs({ id }: WhyChoosingUsProps) {
   return (
-    <section id={id} className="border-b border-divider-soft bg-surface py-14 md:py-24">
+    <section id={id} className="border-b border-divider-soft bg-surface pb-14 pt-12 md:pb-24 md:pt-20">
       <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-6 md:px-10 lg:grid-cols-[19%_70%] lg:gap-x-[11%] lg:px-20">
         <motion.div
           variants={containerVariants}

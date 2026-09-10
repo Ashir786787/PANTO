@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useProducts } from "@/context/ProductsContext";
 
 interface MobileMenuProps {
   open: boolean;
@@ -27,7 +28,16 @@ export default function MobileMenu({
   activeSection,
 }: MobileMenuProps) {
   const { count } = useCart();
+  const { setActiveCategory, setShowListing } = useProducts();
   const [furnitureOpen, setFurnitureOpen] = useState(false);
+
+  const handleFurnitureClick = (item: string) => {
+    if (item === "Sofa" || item === "Chair") {
+      setActiveCategory(item);
+      setShowListing(false);
+    }
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -100,7 +110,7 @@ export default function MobileMenu({
                             <li key={item}>
                               <a
                                 href="#products"
-                                onClick={onClose}
+                                onClick={() => handleFurnitureClick(item)}
                                 className="block rounded-card px-4 py-2.5 text-[15px] font-medium text-body transition-colors hover:bg-surface-alt hover:text-accent"
                               >
                                 {item}
@@ -130,9 +140,11 @@ export default function MobileMenu({
             </nav>
 
             <div className="flex items-center gap-3 border-t border-border px-6 py-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-button text-white">
-                {count}
-              </span>
+              {count > 0 && (
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-button text-white">
+                  {count}
+                </span>
+              )}
               <span className="text-[14px] font-medium text-heading">
                 {count} item{count === 1 ? "" : "s"} in cart
               </span>

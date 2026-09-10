@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronDown, Menu, ShoppingBag } from "lucide-react";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
 import { useCart } from "@/context/CartContext";
+import { useProducts } from "@/context/ProductsContext";
 import MobileMenu from "@/components/layout/MobileMenu";
 
 interface NavLink {
@@ -34,9 +35,17 @@ const SECTION_IDS = [
 export default function Navbar() {
   const scrolled = useScrollPosition(40);
   const { count } = useCart();
+  const { setActiveCategory, setShowListing } = useProducts();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
+
+  const handleFurnitureClick = (item: string) => {
+    if (item === "Sofa" || item === "Chair") {
+      setActiveCategory(item);
+      setShowListing(false);
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -98,9 +107,7 @@ export default function Navbar() {
                     aria-expanded={dropdownOpen}
                     className={`flex items-center gap-1.5 text-[15px] font-medium transition-colors ${
                       activeSection === link.href
-                        ? scrolled
-                          ? "text-accent"
-                          : "text-accent"
+                        ? "text-accent"
                         : scrolled
                           ? "text-heading hover:text-accent"
                           : "text-white hover:text-accent"
@@ -122,6 +129,7 @@ export default function Navbar() {
                           <li key={item}>
                             <a
                               href="#products"
+                              onClick={() => handleFurnitureClick(item)}
                               className="block px-4 py-2 text-[14px] font-medium text-heading transition-colors hover:bg-surface-alt hover:text-accent"
                             >
                               {item}
@@ -162,9 +170,11 @@ export default function Navbar() {
               }`}
             >
               <ShoppingBag size={18} strokeWidth={1.8} />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
-                {count}
-              </span>
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+                  {count}
+                </span>
+              )}
             </button>
 
             <button
