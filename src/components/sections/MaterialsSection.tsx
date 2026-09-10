@@ -87,6 +87,7 @@ export default function MaterialsSection({ id }: MaterialsSectionProps) {
                 alt="A chair surrounded by warm room textures"
                 width={223}
                 height={229}
+                loading="eager"
                 sizes="(min-width: 1024px) 26vw, 100vw"
                 className="aspect-square w-full object-cover"
               />
@@ -100,6 +101,7 @@ export default function MaterialsSection({ id }: MaterialsSectionProps) {
                 alt="A white sofa against a teal wall"
                 width={223}
                 height={318}
+                loading="eager"
                 sizes="(min-width: 1024px) 26vw, 100vw"
                 className="aspect-square w-full object-cover"
               />
