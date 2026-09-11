@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -76,20 +77,20 @@ interface FooterColumn {
 const EXPLORE_LINKS: FooterColumn = {
   title: "Explore",
   links: [
-    { label: "Home", href: "#home" },
-    { label: "Products", href: "#products" },
-    { label: "About Us", href: "#why-us" },
-    { label: "Reviews", href: "#reviews" },
+    { label: "Home", href: "/" },
+    { label: "Products", href: "/#products" },
+    { label: "About Us", href: "/#why-us" },
+    { label: "Reviews", href: "/#reviews" },
   ],
 };
 
 const USEFUL_LINKS: FooterColumn = {
   title: "Useful Links",
   links: [
-    { label: "Help Center", href: "#contact" },
-    { label: "Track Order", href: "#contact" },
-    { label: "Return Policy", href: "#contact" },
-    { label: "Shipping Info", href: "#contact" },
+    { label: "Help Center", href: "/#contact" },
+    { label: "Track Order", href: "/#contact" },
+    { label: "Return Policy", href: "/#contact" },
+    { label: "Shipping Info", href: "/#contact" },
   ],
 };
 
@@ -225,18 +226,18 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Panto — All rights reserved
           </p>
           <div className="flex items-center gap-6">
-            <a
-              href="#contact"
+            <Link
+              href="/#contact"
               className="text-[14px] text-body transition-colors hover:text-accent"
             >
               Terms &amp; Conditions
-            </a>
-            <a
-              href="#contact"
+            </Link>
+            <Link
+              href="/#contact"
               className="text-[14px] text-body transition-colors hover:text-accent"
             >
               Privacy Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>

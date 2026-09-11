@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Baloo_2, Inter } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 const baloo = Baloo_2({
   variable: "--font-heading",
@@ -26,8 +27,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${baloo.variable} ${inter.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

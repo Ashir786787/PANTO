@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronDown, Menu, ShoppingBag } from "lucide-react";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
 import { useCart } from "@/context/CartContext";
@@ -15,10 +16,10 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { label: "Furniture", href: "#products", hasDropdown: true },
-  { label: "Blog", href: "#materials" },
-  { label: "About Us", href: "#why-us" },
-  { label: "Contact", href: "#contact" },
+  { label: "Furniture", href: "/#products", hasDropdown: true },
+  { label: "Blog", href: "/#materials" },
+  { label: "About Us", href: "/#why-us" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const FURNITURE_ITEMS = ["Sofa", "Chair", "Table", "Cabinet"];
@@ -80,7 +81,7 @@ export default function Navbar() {
           aria-label="Main navigation"
           className="mx-auto flex h-[88px] max-w-[1280px] items-center justify-between px-6 md:px-10 lg:px-20"
         >
-          <a href="#home" className="flex items-center">
+          <Link href="/#home" className="flex items-center">
             <Image
               src="/images/panto-logo.jpg"
               alt="Panto"
@@ -91,7 +92,7 @@ export default function Navbar() {
               }`}
               priority
             />
-          </a>
+          </Link>
 
           <ul className="hidden items-center gap-10 lg:flex">
             {NAV_LINKS.map((link) =>
@@ -127,13 +128,13 @@ export default function Navbar() {
                       <ul className="w-44 overflow-hidden rounded-card border border-border bg-surface py-2 shadow-card">
                         {FURNITURE_ITEMS.map((item) => (
                           <li key={item}>
-                            <a
-                              href="#products"
+                            <Link
+                              href="/#products"
                               onClick={() => handleFurnitureClick(item)}
                               className="block px-4 py-2 text-[14px] font-medium text-heading transition-colors hover:bg-surface-alt hover:text-accent"
                             >
                               {item}
-                            </a>
+                            </Link>
                           </li>
                         ))}
                       </ul>
@@ -160,9 +161,9 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              aria-label={`Cart with ${count} items`}
+            <Link
+              href="/cart"
+              aria-label={`View cart with ${count} items`}
               className={`relative flex h-11 w-11 items-center justify-center rounded-full border transition-all duration-300 ${
                 scrolled
                   ? "border-border bg-surface text-navy-button shadow-card hover:bg-surface-alt"
@@ -175,7 +176,7 @@ export default function Navbar() {
                   {count}
                 </span>
               )}
-            </button>
+            </Link>
 
             <button
               type="button"

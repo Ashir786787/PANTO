@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 interface ExperienceSectionProps {
@@ -68,8 +69,8 @@ export default function ExperienceSection({ id }: ExperienceSectionProps) {
             style, comfort, and budget, so the space you end up with is the one
             you imagined.
           </p>
-          <a
-            href="#products"
+          <Link
+            href="/#products"
             className="group mt-7 inline-flex items-center gap-2 self-start text-[13px] font-medium text-link"
           >
             Read More
@@ -83,7 +84,7 @@ export default function ExperienceSection({ id }: ExperienceSectionProps) {
                 className="h-[13px] w-auto"
               />
             </span>
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

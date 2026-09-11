@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -14,10 +15,10 @@ interface MobileMenuProps {
 }
 
 const NAV_LINKS = [
-  { label: "Furniture", href: "#products" },
-  { label: "Blog", href: "#materials" },
-  { label: "About Us", href: "#why-us" },
-  { label: "Contact", href: "#contact" },
+  { label: "Furniture", href: "/#products" },
+  { label: "Blog", href: "/#materials" },
+  { label: "About Us", href: "/#why-us" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const FURNITURE_ITEMS = ["Sofa", "Chair", "Table", "Cabinet"];
@@ -108,13 +109,13 @@ export default function MobileMenu({
                         <ul className="mt-1 flex flex-col gap-1 pl-4">
                           {FURNITURE_ITEMS.map((item) => (
                             <li key={item}>
-                              <a
-                                href="#products"
+                              <Link
+                                href="/#products"
                                 onClick={() => handleFurnitureClick(item)}
                                 className="block rounded-card px-4 py-2.5 text-[15px] font-medium text-body transition-colors hover:bg-surface-alt hover:text-accent"
                               >
                                 {item}
-                              </a>
+                              </Link>
                             </li>
                           ))}
                         </ul>
@@ -140,14 +141,20 @@ export default function MobileMenu({
             </nav>
 
             <div className="flex items-center gap-3 border-t border-border px-6 py-5">
-              {count > 0 && (
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-button text-white">
-                  {count}
+              <Link
+                href="/cart"
+                onClick={onClose}
+                className="flex items-center gap-3"
+              >
+                {count > 0 && (
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-button text-white">
+                    {count}
+                  </span>
+                )}
+                <span className="text-[14px] font-medium text-heading">
+                  {count} item{count === 1 ? "" : "s"} in cart
                 </span>
-              )}
-              <span className="text-[14px] font-medium text-heading">
-                {count} item{count === 1 ? "" : "s"} in cart
-              </span>
+              </Link>
             </div>
           </motion.aside>
         </>

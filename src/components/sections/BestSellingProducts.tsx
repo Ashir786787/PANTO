@@ -155,12 +155,20 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(Math.max(page, 0), totalPages - 1);
-  const visible = filtered.slice(
-    safePage * PAGE_SIZE,
-    safePage * PAGE_SIZE + PAGE_SIZE,
-  );
+  const visible = showListing
+    ? filtered
+    : filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const gridKey = `${activeCategory}-${showListing}-${safePage}`;
+  const showPagination = !showListing && totalPages > 1;
+
+  const gridClass = showListing
+    ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+    : "no-scrollbar flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto pb-3 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4";
+
+  const cardClass = showListing
+    ? ""
+    : "w-[78%] shrink-0 snap-center sm:w-auto sm:shrink";
 
   const selectCategory = (category: ProductCategory) => {
     setActiveCategory(category);
@@ -169,11 +177,14 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
   };
 
   const handleViewAll = () => {
+    const next = !showListing;
     setPage(0);
-    setShowListing(!showListing);
-    window.setTimeout(() => {
-      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
+    setShowListing(next);
+    if (next) {
+      window.setTimeout(() => {
+        gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }
   };
 
   return (
@@ -187,7 +198,7 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
           <div
             role="tablist"
             aria-label="Filter products by category"
-            className="flex items-center gap-1 rounded-full bg-surface-alt p-1.5"
+            className="no-scrollbar flex items-center gap-1 overflow-x-auto rounded-full bg-surface-alt p-1.5"
           >
             {productCategories.map((category) => {
               const isActive = !showListing && category === activeCategory;
@@ -198,7 +209,7 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => selectCategory(category)}
-                  className={`relative rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                  className={`relative whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
                     isActive
                       ? "text-heading"
                       : "text-body-light hover:text-body"
@@ -223,7 +234,7 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
         </div>
 
         <div ref={gridRef} className="relative mt-10 scroll-mt-28">
-          {totalPages > 1 && (
+          {showPagination && (
             <>
               <button
                 type="button"
@@ -255,10 +266,12 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+              className={gridClass}
             >
               {visible.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div key={product.id} className={cardClass}>
+                  <ProductCard product={product} />
+                </div>
               ))}
             </motion.div>
           </AnimatePresence>
@@ -268,12 +281,15 @@ export default function BestSellingProducts({ id }: BestSellingProductsProps) {
           <button
             type="button"
             onClick={handleViewAll}
+            aria-expanded={showListing}
             className="group inline-flex items-center gap-2 text-[15px] font-semibold text-link transition-colors hover:text-accent"
           >
-            View All
+            {showListing ? "Show Less" : "View All"}
             <ArrowRight
               size={18}
-              className="transition-transform duration-300 group-hover:translate-x-1"
+              className={`transition-transform duration-300 group-hover:translate-x-1 ${
+                showListing ? "rotate-90" : ""
+              }`}
             />
           </button>
         </div>

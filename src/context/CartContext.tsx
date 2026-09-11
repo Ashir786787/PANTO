@@ -15,6 +15,7 @@ interface CartContextValue {
   count: number;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
+  updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
 }
 
@@ -70,6 +71,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const updateQuantity = (productId: number, quantity: number) => {
+    setItems((prev) => {
+      const next =
+        quantity < 1
+          ? prev.filter((item) => item.product.id !== productId)
+          : prev.map((item) =>
+              item.product.id === productId ? { ...item, quantity } : item,
+            );
+      writeStoredCart(next);
+      return next;
+    });
+  };
+
   const clearCart = () => {
     writeStoredCart([]);
     setItems([]);
@@ -81,7 +95,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ items, count, addToCart, removeFromCart, clearCart }),
+    () => ({ items, count, addToCart, removeFromCart, updateQuantity, clearCart }),
     [items, count],
   );
 

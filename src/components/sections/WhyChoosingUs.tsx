@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 interface WhyChoosingUsProps {
@@ -85,8 +86,8 @@ export default function WhyChoosingUs({ id }: WhyChoosingUsProps) {
               <p className="mt-6 text-[15px] leading-[1.5] text-body">
                 {feature.description}
               </p>
-              <a
-                href="#products"
+              <Link
+                href="/#products"
                 className="group mt-6 inline-flex items-center gap-2 self-start text-[13px] font-medium text-link"
               >
                 More Info
@@ -100,7 +101,7 @@ export default function WhyChoosingUs({ id }: WhyChoosingUsProps) {
                     className="h-[13px] w-auto"
                   />
                 </span>
-              </a>
+              </Link>
             </motion.div>
           ))}
         </motion.div>

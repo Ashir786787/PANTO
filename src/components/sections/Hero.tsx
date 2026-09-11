@@ -271,7 +271,7 @@ export default function Hero({ id }: HeroProps) {
       ref={sectionRef}
       id={id}
       onMouseMove={handleMouseMove}
-      className="relative flex min-h-[640px] flex-col overflow-hidden bg-hero-bg lg:min-h-[720px]"
+      className="relative flex min-h-[560px] flex-col overflow-hidden bg-hero-bg sm:min-h-[640px] lg:min-h-[720px]"
     >
       <motion.div
         aria-hidden="true"

@@ -1,7 +1,10 @@
 ﻿"use client";
 
+import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface MaterialsSectionProps {
   id: string;
@@ -26,7 +29,88 @@ const collageItemVariants = {
   },
 };
 
+interface MaterialCardProps {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  eager?: boolean;
+  carouselRef: React.RefObject<HTMLDivElement | null>;
+  className: string;
+}
+
+function MaterialCard({
+  src,
+  alt,
+  width,
+  height,
+  eager = false,
+  carouselRef,
+  className,
+}: MaterialCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef({ left: 0, width: 0, containerWidth: 0 });
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const { scrollX } = useScroll({ container: carouselRef });
+
+  useLayoutEffect(() => {
+    if (!isMobile) return;
+    const card = cardRef.current;
+    const container = carouselRef.current;
+    if (!card || !container) return;
+    const cardRect = card.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    measureRef.current = {
+      left: cardRect.left - containerRect.left,
+      width: cardRect.width,
+      containerWidth: containerRect.width,
+    };
+  }, [isMobile, carouselRef]);
+
+  const opacity = useTransform(scrollX, (x) => {
+    const { left, width, containerWidth } = measureRef.current;
+    if (!width || !containerWidth) return 1;
+    const target = left - (containerWidth - width) / 2;
+    const t = Math.abs(x - target) / (width / 1.2);
+    return 1 - 0.4 * Math.min(1, t);
+  });
+
+  const scale = useTransform(scrollX, (x) => {
+    const { left, width, containerWidth } = measureRef.current;
+    if (!width || !containerWidth) return 1;
+    const target = left - (containerWidth - width) / 2;
+    const t = Math.abs(x - target) / (width / 1.2);
+    return 1 - 0.06 * Math.min(1, t);
+  });
+
+  return (
+    <motion.div
+      variants={collageItemVariants}
+      ref={cardRef}
+      className={className}
+    >
+      <motion.div
+        style={isMobile ? { opacity, scale } : { opacity: 1, scale: 1 }}
+        className="h-full w-full"
+      >
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={eager ? "eager" : undefined}
+          sizes="(min-width: 1024px) 26vw, (min-width: 768px) 100vw, 78vw"
+          className="h-full w-full object-cover"
+        />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function MaterialsSection({ id }: MaterialsSectionProps) {
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   return (
     <section
       id={id}
@@ -52,8 +136,8 @@ export default function MaterialsSection({ id }: MaterialsSectionProps) {
             stitched to last, and each surface is tested for wear, so the pieces
             we ship stay beautiful long after they arrive.
           </p>
-          <a
-            href="#products"
+          <Link
+            href="/#products"
             className="group mt-7 inline-flex items-center gap-2 self-start text-[13px] font-medium text-link"
           >
             Read More
@@ -67,60 +151,43 @@ export default function MaterialsSection({ id }: MaterialsSectionProps) {
                 className="h-[13px] w-auto"
               />
             </span>
-          </a>
+          </Link>
         </motion.div>
 
-<motion.div
+        <motion.div
+          ref={carouselRef}
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="flex w-full flex-col items-stretch gap-[18px] lg:flex-row lg:items-stretch lg:gap-[24px]"
+          className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto pb-3 md:flex-col md:snap-none md:gap-[22px] md:overflow-visible lg:grid lg:grid-cols-[minmax(0,220px)_minmax(0,232px)] lg:grid-rows-[repeat(2,auto)] lg:gap-[24px]"
         >
-          <div className="flex w-full flex-col gap-[22px] lg:w-[220px]">
-            <motion.div
-              variants={collageItemVariants}
-              className="overflow-hidden rounded-card shadow-card"
-            >
-              <Image
-                src="/images/material-1.jpg?v=2"
-                alt="A chair surrounded by warm room textures"
-                width={223}
-                height={229}
-                loading="eager"
-                sizes="(min-width: 1024px) 26vw, 100vw"
-                className="aspect-square w-full object-cover"
-              />
-            </motion.div>
-            <motion.div
-              variants={collageItemVariants}
-              className="overflow-hidden rounded-card shadow-card"
-            >
-              <Image
-                src="/images/material-2.jpg?v=2"
-                alt="A white sofa against a teal wall"
-                width={223}
-                height={318}
-                loading="eager"
-                sizes="(min-width: 1024px) 26vw, 100vw"
-                className="aspect-square w-full object-cover"
-              />
-            </motion.div>
-          </div>
-
-          <motion.div
-            variants={collageItemVariants}
-            className="aspect-[4/5] w-full overflow-hidden rounded-card shadow-card lg:mt-[64px] lg:h-[288px] lg:w-[232px] lg:aspect-auto"
-          >
-            <Image
-              src="/images/material-3.jpg?v=2"
-              alt="Dining chairs finished in premium upholstery"
-              width={445}
-              height={445}
-              sizes="(min-width: 1024px) 27vw, 100vw"
-              className="h-full w-full object-cover"
-            />
-          </motion.div>
+          <MaterialCard
+            src="/images/material-1.jpg?v=2"
+            alt="A chair surrounded by warm room textures"
+            width={223}
+            height={229}
+            eager
+            carouselRef={carouselRef}
+            className="relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-card shadow-card md:w-full md:aspect-square lg:col-start-1 lg:row-start-1"
+          />
+          <MaterialCard
+            src="/images/material-2.jpg?v=2"
+            alt="A white sofa against a teal wall"
+            width={223}
+            height={318}
+            eager
+            carouselRef={carouselRef}
+            className="relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-card shadow-card md:w-full md:aspect-square lg:col-start-1 lg:row-start-2"
+          />
+          <MaterialCard
+            src="/images/material-3.jpg?v=2"
+            alt="Dining chairs finished in premium upholstery"
+            width={445}
+            height={445}
+            carouselRef={carouselRef}
+            className="relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-card shadow-card md:w-full lg:col-start-2 lg:row-span-2 lg:mt-[64px] lg:h-[288px] lg:w-[232px] lg:self-start lg:aspect-auto"
+          />
         </motion.div>
       </div>
     </section>
